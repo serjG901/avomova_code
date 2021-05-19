@@ -11,6 +11,8 @@ const style = `
     focus:outline-none 
     focus:shadow-outline
     select-none
+    flex
+    justify-center
     filter 
     drop-shadow-lg
     transition 
@@ -63,7 +65,7 @@ export default function Button({
         ${rounded ? styleRounded : ""}
         `}
     >
-      {text ? text : children}
+      <div className="self-center">{text ? text : children}</div>
     </div>
   );
 }

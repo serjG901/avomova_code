@@ -12,10 +12,11 @@ export default function Search({ search, handleSearch }: ISearch) {
   const searchChange = (event: React.FormEvent<HTMLInputElement>) => {
     handleSearch(event.currentTarget.value.trim());
   };
-  const clearSearch = () => {
+  const openCloseSearch = () => {
     setSearchOpen(!searchOpen);
-    if (search) {
+    if (searchOpen) {
       handleSearch("");
+      inputRef.current?.blur();
     } else {
       inputRef.current?.focus();
     }
@@ -26,17 +27,22 @@ export default function Search({ search, handleSearch }: ISearch) {
         ref={inputRef}
         className={`${
           searchOpen
-            ? "transition ease-linear opacity-100 flex-1 h-12 self-center px-2 text-xl appearance-none focus:outline-none focus:shadow-outline"
-            : "transition ease-linear opacity-0 w-0 appearance-none"
+            ? "flex-1 h-12 self-center px-2 text-xl appearance-none focus:outline-none focus:shadow-outline"
+            : "w-0 appearance-none"
         }`}
         value={search}
         onChange={searchChange}
         maxLength={12}
         placeholder="title or description"
       />
-      <Button isActive={searchOpen} rounded={true} action={clearSearch}>
-        &#128269;
-      </Button>
+      <div
+        className="flex-1 flex-grow-0"
+        title={searchOpen ? "close search" : "open search"}
+      >
+        <Button isActive={searchOpen} rounded={true} action={openCloseSearch}>
+          &#x1F50E;&#xFE0E;
+        </Button>
+      </div>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 import * as React from "react";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { GET_MEDIA } from "../graphql/query";
 import Language from "../tags/Language";
 import MangaTag from "../tags/MangaTag";
 import Status from "../tags/Status";
-import LoadingCard from "../common/LoadingCard";
+import LoadingCard from "../common/LoadingCard2";
 import Poster from "./Poster";
 import Title from "./Title";
 import TitleEn from "./TitleEn";
@@ -72,12 +72,20 @@ export default function Card({
       },
     },
   });
-  const { loading, error, data } = useQuery(GET_MEDIA, {
+  const [getData, { loading, error, data }] = useLazyQuery(GET_MEDIA, {
     variables: {
       slug,
       mediaType,
     },
   });
+
+  React.useEffect(() => {
+    let cleanupFunction = false;
+    if (!cleanupFunction) getData();
+    return () => {
+      cleanupFunction = true;
+    };
+  }, [getData]);
 
   React.useEffect(() => {
     let cleanupFunction = false;
@@ -93,8 +101,6 @@ export default function Card({
 
   if (cardData.loading) return <LoadingCard />;
   if (cardData.error) return <p>Error :(</p>;
-
-  console.log(mediaType);
 
   return (
     <div className="flex flex-col m-4">

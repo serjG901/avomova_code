@@ -7,18 +7,18 @@ const hoverStyle = `${
 }`;
 
 const style = `
-select-none 
-flex 
-flex-col 
-my-4 
-justify-center 
-items-center 
-w-full 
-h-18 
-text-white 
-text-xl 
-bg-indigo-900
-`;
+  select-none 
+  flex 
+  flex-col 
+  my-4 
+  justify-center 
+  items-center 
+  w-full 
+  h-18 
+  text-white 
+  text-xl 
+  bg-indigo-900
+  `;
 
 interface IShowMore {
   pagination: number;

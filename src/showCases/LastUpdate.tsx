@@ -1,6 +1,6 @@
 import * as React from "react";
 import { GET_UPDATES_LIST } from "../graphql/query";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import MenuUpdate from "../components/MenuUpdate";
 import CardLastUpdate from "../card/CardLastUpdate";
 import LoadingDots from "../common/LoadingDots";
@@ -39,7 +39,7 @@ export default function LastUpdate({
   const [pagination, setPagination] = React.useState(0);
   const [limit, setLimit] = React.useState(0);
 
-  const { loading, error, data } = useQuery(GET_UPDATES_LIST, {
+  const [getData, { loading, error, data }] = useLazyQuery(GET_UPDATES_LIST, {
     variables: {
       offset: 0,
       limit,
@@ -47,6 +47,14 @@ export default function LastUpdate({
     },
     fetchPolicy: "cache-and-network",
   });
+
+  React.useEffect(() => {
+    let cleanupFunction = false;
+    if (!cleanupFunction) getData();
+    return () => {
+      cleanupFunction = true;
+    };
+  }, [getData]);
 
   React.useEffect(() => {
     let cleanupFunction = false;
@@ -124,7 +132,7 @@ export default function LastUpdate({
     }
   };
 
-  return data && docs.length ? (
+  return docs.length ? (
     <div className="flex flex-col">
       <MenuUpdate option={type} showOption={handleType} />
       <div className="flex flex-wrap">
@@ -134,7 +142,7 @@ export default function LastUpdate({
               <CardLastUpdate
                 key={doc.url + doc.date.updated}
                 url={doc.url}
-                type={doc.type}
+                type={doc.type.toLowerCase()}
                 duraction={doc.duraction}
                 date={doc.date}
                 history={history}
@@ -143,7 +151,7 @@ export default function LastUpdate({
             )
         )}
       </div>
-      {data && pagination !== docs.length && pagination !== 0 && (
+      {data && pagination !== 0 && (
         <ShowMore
           pagination={pagination}
           length={docs.length}
@@ -151,7 +159,7 @@ export default function LastUpdate({
         />
       )}
     </div>
-  ) : data && !docs.length ? (
+  ) : (
     <div className="text-white m-4">NOT FOUND</div>
-  ) : null;
+  );
 }

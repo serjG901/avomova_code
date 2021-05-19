@@ -15,6 +15,7 @@ interface IWatch {
 }
 
 const style = `
+  select-none
   transition 
   ease-linear 
   w-full 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { GET_MEDIA_LIST } from "../graphql/query";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import Card from "../card/Card";
 import ShowMore from "../components/ShowMore";
 import LoadingDots from "../common/LoadingDots";
@@ -55,7 +55,7 @@ export default function ShowCase({
   const [docs, setDocs] = React.useState<ICard[]>([]);
   const [pagination, setPagination] = React.useState(0);
   const [limit, setLimit] = React.useState(0);
-  const { loading, error, data } = useQuery(GET_MEDIA_LIST, {
+  const [getData, { loading, error, data }] = useLazyQuery(GET_MEDIA_LIST, {
     variables: {
       offset: 0,
       limit,
@@ -64,6 +64,14 @@ export default function ShowCase({
     },
     fetchPolicy: "cache-and-network",
   });
+
+  React.useEffect(() => {
+    let cleanupFunction = false;
+    if (!cleanupFunction) getData();
+    return () => {
+      cleanupFunction = true;
+    };
+  }, [getData]);
 
   React.useEffect(() => {
     let cleanupFunction = false;
@@ -143,7 +151,7 @@ export default function ShowCase({
     }
   };
 
-  return data && docs.length ? (
+  return docs.length ? (
     <div className="flex flex-col">
       <div className="flex flex-wrap">
         {docs.map(
@@ -160,7 +168,7 @@ export default function ShowCase({
             )
         )}
       </div>
-      {data && pagination !== docs.length && pagination !== 0 && (
+      {data && pagination !== 0 && (
         <ShowMore
           pagination={pagination}
           length={docs.length}
@@ -168,7 +176,7 @@ export default function ShowCase({
         />
       )}
     </div>
-  ) : data && !docs.length ? (
+  ) : (
     <div className="text-white m-4">NOT FOUND</div>
-  ) : null;
+  );
 }

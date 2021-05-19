@@ -7,7 +7,7 @@ interface IMenu {
 
 export default function Menu({ option, showOption }: IMenu) {
   return (
-    <div className="flex flex-wrap">
+    <div className="flex flex-wrap justify-end">
       <Button
         text="all"
         isActive={option === "all"}
@@ -31,12 +31,6 @@ export default function Menu({ option, showOption }: IMenu) {
         isActive={option === "manga"}
         action={showOption}
         payload="manga"
-      />
-      <Button
-        text="cinema"
-        isActive={option === "cinema"}
-        action={showOption}
-        payload="cinema"
       />
     </div>
   );
