@@ -8,7 +8,7 @@ interface IPlayer {
   slug: string;
   mediaType: string;
   closePlayer: () => void;
-  title: {
+  titleMedia: {
     be: string;
     en: string;
   };
@@ -30,7 +30,7 @@ export default function Player({
   slug,
   mediaType,
   closePlayer,
-  title,
+  titleMedia,
   description,
 }: IPlayer) {
   const [playerStore, setPlayerStore] = useLocalStorage(slug, "");
@@ -174,7 +174,7 @@ export default function Player({
         </div>
         <div
           onClick={() => {
-            handleMarks({ slug, mediaType, title, description });
+            handleMarks({ slug, mediaType, title: titleMedia, description });
           }}
           className="text-indigo-900 font-bold p-2 m-2 self-end cursor-pointer rounded border border-indigo-900 hover:bg-indigo-900 hover:text-black"
         >

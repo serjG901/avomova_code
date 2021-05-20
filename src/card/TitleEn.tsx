@@ -1,12 +1,10 @@
 interface ITitle {
   be: string;
-  ru: string;
   en: string;
-  alt: string;
 }
 
 interface ITitleCard {
-  title: ITitle;
+  titleMedia: ITitle;
   search: string;
 }
 
@@ -19,11 +17,11 @@ italic
 leading-5
 `;
 
-export default function TitleEn({ title, search }: ITitleCard) {
+export default function TitleEn({ titleMedia, search }: ITitleCard) {
   return (
     <div className={style}>
       {search !== ""
-        ? title.en
+        ? titleMedia.en
             .replaceAll(search, `||${search}||`)
             .replaceAll(
               search[0].toUpperCase() + search.slice(1),
@@ -40,7 +38,7 @@ export default function TitleEn({ title, search }: ITitleCard) {
                 item
               )
             )
-        : title.en}
+        : titleMedia.en}
     </div>
   );
 }

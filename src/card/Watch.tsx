@@ -5,7 +5,7 @@ import Reader from "./Reader";
 interface IWatch {
   type: string;
   slug: string;
-  title: {
+  titleMedia: {
     be: string;
     en: string;
   };
@@ -27,7 +27,7 @@ const style = `
   hover:bg-indigo-400 
 `;
 
-export default function Watch({ type, slug, title, description }: IWatch) {
+export default function Watch({ type, slug, titleMedia, description }: IWatch) {
   let mediaType = "";
   switch (type) {
     case "anime":
@@ -72,7 +72,7 @@ export default function Watch({ type, slug, title, description }: IWatch) {
           slug={slug}
           mediaType={mediaType}
           closePlayer={handleClosePlayer}
-          title={title}
+          titleMedia={titleMedia}
           description={description}
         />
       ) : (
@@ -80,7 +80,7 @@ export default function Watch({ type, slug, title, description }: IWatch) {
           slug={slug}
           mediaType={mediaType}
           closePlayer={handleClosePlayer}
-          title={title}
+          titleMedia={titleMedia}
           description={description}
         />
       )}

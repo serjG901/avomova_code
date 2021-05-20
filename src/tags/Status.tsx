@@ -1,5 +1,4 @@
 interface IStatus {
-  value: string;
   duraction: {
     start: number;
     end: number;
@@ -19,20 +18,27 @@ const style = `
   flex-col
   max-w-max
   text-white
+  opacity-90
   `;
-export default function Status({ value, duraction, date }: IStatus) {
+
+const styleFinished = `bg-green-500`;
+
+const styleOngoing = `bg-yellow-500`;
+
+export default function Status({ duraction, date }: IStatus) {
+  const status = duraction.start === duraction.end ? "finished" : "ongoing";
   return (
     <div className={style}>
       <div
         className={`px-1 ${
-          value === "finished" ? "bg-green-500" : "bg-yellow-500"
+          status === "finished" ? styleFinished : styleOngoing
         }`}
       >
         <div>
-          {value} ({duraction.start} / {duraction.end})
+          {status} ({duraction.start} / {duraction.end})
         </div>
         {date ? (
-          <div className="text-sm text-black">
+          <div className="text-sm text-gray-900">
             {new Date(date.updated).toLocaleDateString()}
           </div>
         ) : null}

@@ -1,12 +1,10 @@
 interface ITitle {
   be: string;
-  ru: string;
   en: string;
-  alt: string;
 }
 
 interface ITitleCard {
-  title: ITitle;
+  titleMedia: ITitle;
   search: string;
 }
 
@@ -18,11 +16,11 @@ const style = `
   leading-5
   `;
 
-export default function Title({ title, search }: ITitleCard) {
+export default function Title({ titleMedia, search }: ITitleCard) {
   return (
     <div className={style}>
       {search !== ""
-        ? title.be
+        ? titleMedia.be
             .replaceAll(search, `||${search}||`)
             .replaceAll(
               search[0].toUpperCase() + search.slice(1),
@@ -39,7 +37,7 @@ export default function Title({ title, search }: ITitleCard) {
                 item
               )
             )
-        : title.be}
+        : titleMedia.be}
     </div>
   );
 }

@@ -1,16 +1,8 @@
 import * as React from "react";
 import { useLazyQuery } from "@apollo/client";
 import { GET_MEDIA } from "../graphql/query";
-import Language from "../tags/Language";
-import MangaTag from "../tags/MangaTag";
-import Status from "../tags/Status";
 import LoadingCard from "../common/LoadingCard2";
-import Poster from "./Poster";
-import Title from "./Title";
-import TitleEn from "./TitleEn";
-import Tags from "./Tags";
-import Description from "./Description";
-import Watch from "./Watch";
+import CardMedia from "./CardMedia";
 
 interface ICardLastUpdate {
   url: string;
@@ -27,17 +19,34 @@ interface ICardLastUpdate {
   search: string;
 }
 
-const style = `
-relative 
-flex 
-w-full 
-max-w-xs 
-pl-2 
-py-2
-bg-purple-400
-bg-opacity-20
-bg-cover
-`;
+const initialCardData = {
+  loading: true,
+  error: undefined,
+  data: {
+    media: {
+      title: {
+        be: "",
+        en: "",
+      },
+      description: {
+        be: "",
+      },
+      poster: "",
+      duraction: {
+        start: 0,
+        end: 0,
+      },
+      language: [],
+      genres: [],
+      year: 0,
+      dubbers: [],
+      translators: [],
+      editors: [],
+      studio: "",
+      country: "",
+    },
+  },
+};
 
 export default function CardLastUpdate({
   url,
@@ -62,39 +71,7 @@ export default function CardLastUpdate({
       mediaType = "manga";
       break;
   }
-  const [cardData, setCardData] = React.useState({
-    loading: true,
-    error: undefined,
-    data: {
-      media: {
-        language: [],
-        poster: "",
-        status: "",
-        duraction: {
-          start: 0,
-          end: 0,
-        },
-        title: {
-          be: "",
-          ru: "",
-          en: "",
-          alt: "",
-        },
-        description: {
-          be: "",
-          ru: "",
-          en: "",
-        },
-        country: "",
-        year: [],
-        studio: "",
-        genres: [],
-        translators: [],
-        dubbers: [],
-        editors: [],
-      },
-    },
-  });
+  const [cardData, setCardData] = React.useState(initialCardData);
   const [currentType, setCurrentType] = React.useState(mediaType);
   const [getData, { loading, error, data }] = useLazyQuery(GET_MEDIA, {
     variables: {
@@ -137,62 +114,25 @@ export default function CardLastUpdate({
   if (cardData.loading) return <LoadingCard />;
   if (cardData.error) return <p>Error for {url}</p>;
 
-  return cardData.data !== null ? (
-    <div className="flex flex-col m-4">
-      <div
-        className={style}
-        style={{
-          backgroundImage: `url(${`https://anibel.net/${cardData.data.media.poster}`})`,
-        }}
-      >
-        {cardData.data.media.language.length ? (
-          <Language
-            value={cardData.data.media.language}
-            mediaType={mediaType}
-            history={history}
-          />
-        ) : null}
-        {mediaType === "manga" && <MangaTag history={history} />}
-        <Status
-          value={duraction.start === duraction.end ? "finished" : "ongoing"}
-          duraction={duraction}
-          date={date}
-        />
-        <div className="w-1/3 self-center">
-          <Poster
-            poster={cardData.data.media.poster}
-            title={cardData.data.media.title}
-            slug={url}
-          />
-        </div>
-        <div className="flex flex-col w-2/3 h-72 overflow-y-auto scroll-none">
-          <div className="bg-white bg-opacity-90 flex flex-col">
-            <Title title={cardData.data.media.title} search={search} />
-            <TitleEn title={cardData.data.media.title} search={search} />
-            <Description
-              description={cardData.data.media.description}
-              search={search}
-            />
-            <Tags
-              mediaType={mediaType}
-              country={cardData.data.media.country}
-              year={cardData.data.media.year}
-              studio={cardData.data.media.studio}
-              genres={cardData.data.media.genres}
-              translators={cardData.data.media.translators}
-              dubbers={cardData.data.media.dubbers}
-              editors={cardData.data.media.editors}
-              history={history}
-            />
-          </div>
-        </div>
-      </div>
-      <Watch
-        type={currentType}
-        slug={url}
-        title={cardData.data.media.title}
-        description={cardData.data.media.description}
-      />
-    </div>
-  ) : null;
+  return (
+    <CardMedia
+      slug={url}
+      titleMedia={cardData.data.media.title}
+      mediaType={mediaType}
+      description={cardData.data.media.description}
+      history={history}
+      search={search}
+      poster={cardData.data.media.poster}
+      translation={cardData.data.media.language}
+      duraction={duraction}
+      date={date}
+      country={cardData.data.media.country}
+      year={cardData.data.media.year}
+      studio={cardData.data.media.studio}
+      genres={cardData.data.media.genres}
+      translators={cardData.data.media.translators}
+      dubbers={cardData.data.media.dubbers}
+      editors={cardData.data.media.editors}
+    />
+  );
 }

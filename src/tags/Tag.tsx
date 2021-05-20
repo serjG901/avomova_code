@@ -1,7 +1,7 @@
 import queryString from "query-string";
 interface ITag {
   tag: string;
-  value: string | string[] | number;
+  value?: string | string[] | number;
   mediaType: string;
   notSearch?: boolean;
   history: any;
@@ -74,7 +74,7 @@ export default function Tag({
         className={notSearch ? styleNot : style}
         title={notSearch ? "" : `search for ${value}`}
         onClick={() => {
-          if (!notSearch) handleSearchTag(value);
+          if (!notSearch && value) handleSearchTag(value);
         }}
       >
         {value}
