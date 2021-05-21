@@ -1,102 +1,148 @@
-import * as React from "react";
-import { useLazyQuery } from "@apollo/client";
-import { GET_MEDIA } from "../graphql/query";
-import LoadingCard from "../common/LoadingCard2";
-import CardMedia from "./CardMedia";
+import Language from "../tags/Language";
+import MangaTag from "../tags/MangaTag";
+import Status from "../tags/Status";
+import Poster from "../card/Poster";
+import Title from "../card/Title";
+import TitleEn from "../card/TitleEn";
+import Tags from "../card/Tags";
+import Description from "../card/Description";
+import Watch from "../card/Watch";
 
-interface ICard {
-  mediaId: string | number;
+interface ICardMedia {
   slug: string;
+  titleMedia: {
+    be: string;
+    en: string;
+  };
   mediaType: string;
+  description: {
+    be: string;
+  };
   history: any;
   search: string;
+  poster: string;
+  translation: string[];
+  duraction: {
+    start: number;
+    end: number;
+  };
+  date?: {
+    created: Date;
+    updated: Date;
+  };
+  country: string;
+  year: number;
+  studio: string;
+  genres: string[];
+  translators: string[];
+  dubbers: string[];
+  editors: string[];
 }
 
-const initialCardData = {
-  loading: true,
-  error: undefined,
-  data: {
-    media: {
-      title: {
-        be: "",
-        en: "",
-      },
-      description: {
-        be: "",
-      },
-      poster: "",
-      duraction: {
-        start: 0,
-        end: 0,
-      },
-      language: [],
-      genres: [],
-      year: 0,
-      dubbers: [],
-      translators: [],
-      editors: [],
-      studio: "",
-      country: "",
-    },
-  },
-};
+const styleMain = `
+    flex 
+    flex-col 
+    m-4
+    `;
+
+const styleBody = `
+    relative 
+    flex 
+    w-full 
+    max-w-xs 
+    pl-2 
+    py-2
+    bg-purple-400
+    bg-opacity-20
+    bg-cover
+`;
+
+const styleBodyPoster = `
+    w-1/3 
+    self-center
+    `;
+
+const styleBodyDescription = `
+    w-2/3 
+    h-72 
+    flex
+    `;
+
+const styleDescription = `
+    self-center 
+    bg-white 
+    bg-opacity-90 
+    flex 
+    flex-col 
+    max-h-52 
+    overflow-y-auto 
+    scroll-none
+    `;
 
 export default function Card({
-  mediaId,
   slug,
+  titleMedia,
   mediaType,
+  description,
   history,
   search,
-}: ICard) {
-  const [cardData, setCardData] = React.useState(initialCardData);
-  const [getData, { loading, error, data }] = useLazyQuery(GET_MEDIA, {
-    variables: {
-      slug,
-      mediaType,
-    },
-  });
-
-  React.useEffect(() => {
-    let cleanupFunction = false;
-    if (!cleanupFunction) getData();
-    return () => {
-      cleanupFunction = true;
-    };
-  }, [getData]);
-
-  React.useEffect(() => {
-    let cleanupFunction = false;
-    if (!cleanupFunction && !loading && !error && data) {
-      if (cardData.data !== data) {
-        setCardData({ loading, error, data });
-      }
-    }
-    return () => {
-      cleanupFunction = true;
-    };
-  }, [cardData.data, loading, error, data]);
-
-  if (cardData.loading) return <LoadingCard />;
-  if (cardData.error) return <p>Error :(</p>;
-
+  poster,
+  translation,
+  duraction,
+  date,
+  country,
+  year,
+  studio,
+  genres,
+  translators,
+  dubbers,
+  editors,
+}: ICardMedia) {
   return (
-    <CardMedia
-      slug={slug}
-      titleMedia={cardData.data.media.title}
-      mediaType={mediaType}
-      description={cardData.data.media.description}
-      history={history}
-      search={search}
-      poster={cardData.data.media.poster}
-      translation={cardData.data.media.language}
-      duraction={cardData.data.media.duraction}
-      country={cardData.data.media.country}
-      year={cardData.data.media.year}
-      studio={cardData.data.media.studio}
-      genres={cardData.data.media.genres}
-      translators={cardData.data.media.translators}
-      dubbers={cardData.data.media.dubbers}
-      editors={cardData.data.media.editors}
-    />
+    <div className={styleMain}>
+      <div
+        className={styleBody}
+        style={{
+          backgroundImage: `url(${`https://anibel.net/${poster}`})`,
+        }}
+      >
+        {translation.length ? (
+          <Language
+            value={translation}
+            mediaType={mediaType}
+            history={history}
+          />
+        ) : null}
+        {mediaType === "manga" && <MangaTag history={history} />}
+        <Status duraction={duraction} date={date} />
+        <div className={styleBodyPoster}>
+          <Poster poster={poster} titleMedia={titleMedia} slug={slug} />
+        </div>
+        <div className={styleBodyDescription}>
+          <div className={styleDescription}>
+            <Title text={titleMedia.be} search={search} />
+            <TitleEn text={titleMedia.en} search={search} />
+            <Description description={description} search={search} />
+            <Tags
+              mediaType={mediaType}
+              country={country}
+              year={year}
+              studio={studio}
+              genres={genres}
+              translators={translators}
+              dubbers={dubbers}
+              editors={editors}
+              history={history}
+            />
+          </div>
+        </div>
+      </div>
+      <Watch
+        type={mediaType}
+        slug={slug}
+        titleMedia={titleMedia}
+        description={description}
+      />
+    </div>
   );
 }

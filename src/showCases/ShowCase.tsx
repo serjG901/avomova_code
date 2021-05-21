@@ -1,7 +1,7 @@
 import * as React from "react";
 import { GET_MEDIA_LIST } from "../graphql/query";
 import { useLazyQuery } from "@apollo/client";
-import Card from "../card/Card";
+import CardMedia from "../components/CardMedia";
 import ShowMore from "../components/ShowMore";
 import LoadingDots from "../common/LoadingDots";
 
@@ -157,7 +157,7 @@ export default function ShowCase({
         {docs.map(
           (doc: ICard, index) =>
             index < pagination && (
-              <Card
+              <CardMedia
                 key={doc.slug}
                 mediaId={doc.mediaId}
                 slug={doc.slug}

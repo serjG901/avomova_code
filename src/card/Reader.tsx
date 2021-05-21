@@ -1,8 +1,14 @@
 import * as React from "react";
-import { useQuery } from "@apollo/client";
+
+import { useLazyQuery } from "@apollo/client";
 import { GET_MEDIA_CHAPTERS } from "../graphql/query";
-import LoadingDots from "../common/LoadingDots";
+
 import { useLocalStorage } from "../useLocalStorage";
+
+import LoadingDots from "../common/LoadingDots";
+import SizeButton from "../common/SizeButton";
+import MarksButton from "../common/MarksButton";
+import CloseButton from "../common/CloseButton";
 
 interface IPlayer {
   slug: string;
@@ -38,9 +44,6 @@ export default function Player({
     page: 0,
     image: "",
   });
-  const [marksStore, setMarksStore] = useLocalStorage("marks", []);
-
-  const [topPosition, setTopPosition] = React.useState("top-0px");
 
   const [currentImage, setCurrentImage] = React.useState("");
 
@@ -53,33 +56,37 @@ export default function Player({
 
   const ReaderRef = React.useRef<HTMLDivElement>(null);
 
-  const { loading, error, data } = useQuery(GET_MEDIA_CHAPTERS, {
+  const [getData, { loading, error, data }] = useLazyQuery(GET_MEDIA_CHAPTERS, {
     variables: {
       slug,
       mediaType,
     },
     fetchPolicy: "cache-and-network",
   });
+
   React.useEffect(() => {
-    setTopPosition(`top-${window.screenTop}px`);
-  }, []);
+    getData();
+  }, [getData]);
+
+  React.useEffect(() => {
+    if (currentImage === "" && readerStore?.image !== "") {
+      setCurrentImage(readerStore.image);
+      setChapterNumber(readerStore.chapter);
+      setPageNumber(readerStore.page);
+    }
+  }, [readerStore, currentImage]);
 
   React.useEffect(() => {
     if (!loading && data) {
-      if (readerStore && readerStore.image !== "") {
-        setCurrentImage(readerStore.image);
-        setChapterNumber(readerStore.chapter);
-        setPageNumber(readerStore.page);
-      } else {
+      if (currentImage === "" && !readerStore?.image)
         setCurrentImage(
           data.media.chapters.find((chapter: any) => chapter.chapter === 1)
             .images[0].large
         );
-      }
     }
-  }, [loading, data, readerStore]);
+  }, [loading, data, readerStore, currentImage]);
 
-  if (loading)
+  if (!data || loading)
     return (
       <button className={style}>
         <LoadingDots />
@@ -230,75 +237,37 @@ export default function Player({
     }
   };
 
-  const handleMarks = (value: {
-    slug: string;
-    mediaType: string;
-    title: {
-      be: string;
-      en: string;
-    };
-    description: {
-      be: string;
-    };
-  }) => {
-    if (marksStore.find((item: { slug: string }) => item.slug === value.slug)) {
-      setMarksStore(
-        marksStore.filter((item: { slug: string }) => item.slug !== value.slug)
-      );
-    } else {
-      setMarksStore([...marksStore, value]);
-    }
-  };
-
-  return (
+  return data ? (
     <div
       ref={ReaderRef}
-      className={`${topPosition} absolute left-0 z-10 bg-black bg-opacity-90 w-full flex flex-col`}
+      className={`absolute left-0 z-10 bg-black bg-opacity-90 w-full flex flex-col`}
     >
-      <div className="flex justify-between">
-        <div className="flex self-center text-white">
-          <div
-            className={`${
-              imageWidth === "w-1/4"
-                ? "cursor-not-allowed"
-                : "cursor-pointer hover:bg-gray-600 hover:text-black"
-            } px-4 mx-2 text-2xl rounded text-gray-600 border border-gray-600`}
-            onClick={() => {
+      <div className="flex justify-between py-4">
+        <div className="flex">
+          <SizeButton
+            text={`-`}
+            description={`lower`}
+            notAllowed={imageWidth === "w-1/4"}
+            action={() => {
               handleSetImageWidth("-");
             }}
-          >
-            -
-          </div>
-          <div
-            className={`${
-              imageWidth === "w-3/4"
-                ? "cursor-not-allowed"
-                : "cursor-pointer hover:bg-gray-600 hover:text-black"
-            } px-4 mx-2 text-2xl rounded text-gray-600 border border-gray-600`}
-            onClick={() => {
+          />
+          <SizeButton
+            text={`+`}
+            description={`bigger`}
+            notAllowed={imageWidth === "w-3/4"}
+            action={() => {
               handleSetImageWidth("+");
             }}
-          >
-            +
-          </div>
+          />
         </div>
-        <div
-          onClick={() => {
-            handleMarks({ slug, mediaType, title: titleMedia, description });
-          }}
-          className="text-indigo-900 font-bold p-2 m-2 self-end cursor-pointer rounded border border-indigo-900 hover:bg-indigo-900 hover:text-black"
-        >
-          {marksStore.find((item: { slug: string }) => item.slug === slug)
-            ? "delete from marks"
-            : "add to marks"}
-        </div>
-        <div
-          title="close reader"
-          className="text-red-900 font-bold p-2 m-2 self-end cursor-pointer rounded border border-red-900 hover:bg-red-900 hover:text-black"
-          onClick={closePlayer}
-        >
-          close
-        </div>
+        <MarksButton
+          slug={slug}
+          mediaType={mediaType}
+          titleMedia={titleMedia}
+          description={description}
+        />
+        <CloseButton target="reader" action={closePlayer} />
       </div>
       <div className="flex flex-col self-center">
         <div className={`text-white ${loadingImage ? "animate-pulse" : ""}`}>
@@ -344,10 +313,7 @@ export default function Player({
       <div className="flex flex-wrap">
         {data.media.chapters.map((chapter: any) => {
           return (
-            <div
-              key={Math.random().toString()}
-              className="flex mb-4 flex-wrap p-2"
-            >
+            <div key={chapter.chapter} className="flex mb-4 flex-wrap p-2">
               <div className="flex flex-col">
                 <div className="text-white text-left">
                   chapter {chapter.chapter}
@@ -360,12 +326,24 @@ export default function Player({
                     ) => {
                       return (
                         <div
-                          key={Math.random().toString()}
-                          className={`${
-                            currentImage === image.large
-                              ? "bg-gray-300"
-                              : "bg-gray-900"
-                          } w-24 h-40 overflow-y-scroll scroll-none p-2 border border-black text-sm cursor-pointer transition ease-linear hover:bg-gray-300`}
+                          key={index}
+                          className={`
+                            flex
+                            flex-col
+                            w-24 
+                            pb-4
+                            border 
+                            border-black 
+                            text-sm 
+                            cursor-pointer 
+                            transition 
+                            ease-linear 
+                            hover:bg-gray-500 
+                            ${
+                              currentImage === image.large
+                                ? "bg-gray-500 text-black"
+                                : "bg-gray-900 text-white"
+                            }`}
                           onClick={() => {
                             setLoadingImage(true);
                             setChapterNumber(chapter.chapter);
@@ -379,11 +357,15 @@ export default function Player({
                             ReaderRef.current?.scrollIntoView();
                           }}
                         >
-                          <img
-                            alt="tittle"
-                            src={image.thumbnail}
-                            loading="lazy"
-                          />
+                          <span>Page {index}</span>
+                          {chapterNumber === chapter.chapter && (
+                            <img
+                              className="self-center"
+                              alt={`Page ${index}`}
+                              src={image.thumbnail}
+                              loading="lazy"
+                            />
+                          )}
                         </div>
                       );
                     }
@@ -395,5 +377,5 @@ export default function Player({
         })}
       </div>
     </div>
-  );
+  ) : null;
 }

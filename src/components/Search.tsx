@@ -6,12 +6,53 @@ interface ISearch {
   handleSearch: (value: string) => void;
 }
 
+const style = `
+  flex 
+  relative
+  justify-end 
+  w-full 
+  self-end 
+  mr-1 
+  my-1
+  `;
+
+const styleInput = `
+  transition-all
+  ease-linear
+  filter 
+  drop-shadow-lg
+  h-10 
+  rounded-full
+  px-2 
+  m-2
+  text-xl 
+  appearance-none 
+  focus:outline-none 
+  focus:shadow-outline
+`;
+
+const styleSearchOpen = `
+  pl-4 
+  pr-10
+  w-56
+  `;
+const styleSearchClose = `
+  w-10
+  `;
+
+const styleButton = `
+  absolute 
+  `;
+
 export default function Search({ search, handleSearch }: ISearch) {
   const inputRef = React.useRef<HTMLInputElement>(null);
+
   const [searchOpen, setSearchOpen] = React.useState(false);
+
   const searchChange = (event: React.FormEvent<HTMLInputElement>) => {
     handleSearch(event.currentTarget.value.trim());
   };
+
   const openCloseSearch = () => {
     setSearchOpen(!searchOpen);
     if (searchOpen) {
@@ -21,14 +62,13 @@ export default function Search({ search, handleSearch }: ISearch) {
       inputRef.current?.focus();
     }
   };
+
   return (
-    <div className="flex justify-end w-full max-w-xs self-end mr-1 my-1">
+    <div className={style}>
       <input
         ref={inputRef}
-        className={`${
-          searchOpen
-            ? "flex-1 h-12 self-center px-2 text-xl appearance-none focus:outline-none focus:shadow-outline"
-            : "w-0 appearance-none"
+        className={`${styleInput} ${
+          searchOpen ? styleSearchOpen : styleSearchClose
         }`}
         value={search}
         onChange={searchChange}
@@ -36,7 +76,7 @@ export default function Search({ search, handleSearch }: ISearch) {
         placeholder="title or description"
       />
       <div
-        className="flex-1 flex-grow-0"
+        className={styleButton}
         title={searchOpen ? "close search" : "open search"}
       >
         <Button isActive={searchOpen} rounded={true} action={openCloseSearch}>

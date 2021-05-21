@@ -1,27 +1,23 @@
-interface ITitle {
-  be: string;
-  en: string;
-}
-
 interface ITitleCard {
-  titleMedia: ITitle;
+  text: string;
   search: string;
 }
 
 const style = `
-px-1
-text-sm 
-text-gray-800 
-text-left
-italic
-leading-5
-`;
+  break-word
+  px-1
+  text-sm 
+  text-gray-800 
+  text-left
+  italic
+  leading-5
+  `;
 
-export default function TitleEn({ titleMedia, search }: ITitleCard) {
+export default function TitleEn({ text, search }: ITitleCard) {
   return (
     <div className={style}>
       {search !== ""
-        ? titleMedia.en
+        ? text
             .replaceAll(search, `||${search}||`)
             .replaceAll(
               search[0].toUpperCase() + search.slice(1),
@@ -38,7 +34,7 @@ export default function TitleEn({ titleMedia, search }: ITitleCard) {
                 item
               )
             )
-        : titleMedia.en}
+        : text}
     </div>
   );
 }

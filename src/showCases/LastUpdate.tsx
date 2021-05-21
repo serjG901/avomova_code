@@ -2,7 +2,7 @@ import * as React from "react";
 import { GET_UPDATES_LIST } from "../graphql/query";
 import { useLazyQuery } from "@apollo/client";
 import MenuUpdate from "../components/MenuUpdate";
-import CardLastUpdate from "../card/CardLastUpdate";
+import CardLastUpdate from "../components/CardLastUpdate";
 import LoadingDots from "../common/LoadingDots";
 import ShowMore from "../components/ShowMore";
 
@@ -141,7 +141,7 @@ export default function LastUpdate({
             index < pagination && (
               <CardLastUpdate
                 key={doc.url + doc.date.updated}
-                url={doc.url}
+                slug={doc.url}
                 type={doc.type.toLowerCase()}
                 duraction={doc.duraction}
                 date={doc.date}

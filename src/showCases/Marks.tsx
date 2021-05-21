@@ -1,5 +1,5 @@
 import * as React from "react";
-import Card from "../card/Card";
+import CardMedia from "../components/CardMedia";
 import { useLocalStorage } from "../useLocalStorage";
 
 interface IMark {
@@ -44,7 +44,7 @@ export default function Marks({ history, search }: IMarks) {
   return markDocs.length ? (
     <div className="flex flex-wrap">
       {markDocs.map((mark: IMark, index: number) => (
-        <Card
+        <CardMedia
           key={mark.slug}
           mediaId={index}
           slug={mark.slug}

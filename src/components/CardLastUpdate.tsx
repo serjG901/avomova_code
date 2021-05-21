@@ -2,10 +2,10 @@ import * as React from "react";
 import { useLazyQuery } from "@apollo/client";
 import { GET_MEDIA } from "../graphql/query";
 import LoadingCard from "../common/LoadingCard2";
-import CardMedia from "./CardMedia";
+import Card from "../card/Card";
 
 interface ICardLastUpdate {
-  url: string;
+  slug: string;
   type: string;
   duraction: {
     start: number;
@@ -49,7 +49,7 @@ const initialCardData = {
 };
 
 export default function CardLastUpdate({
-  url,
+  slug,
   type,
   duraction,
   date,
@@ -70,12 +70,15 @@ export default function CardLastUpdate({
     case "manga":
       mediaType = "manga";
       break;
+    case "news":
+      mediaType = "news";
+      break;
   }
   const [cardData, setCardData] = React.useState(initialCardData);
   const [currentType, setCurrentType] = React.useState(mediaType);
   const [getData, { loading, error, data }] = useLazyQuery(GET_MEDIA, {
     variables: {
-      slug: url,
+      slug,
       mediaType: currentType,
     },
     fetchPolicy: "cache-and-network",
@@ -112,13 +115,13 @@ export default function CardLastUpdate({
   }, [cardData.data, loading, error, data]);
 
   if (cardData.loading) return <LoadingCard />;
-  if (cardData.error) return <p>Error for {url}</p>;
+  if (cardData.error) return <p>Error for {slug}</p>;
 
   return (
-    <CardMedia
-      slug={url}
+    <Card
+      slug={slug}
       titleMedia={cardData.data.media.title}
-      mediaType={mediaType}
+      mediaType={currentType}
       description={cardData.data.media.description}
       history={history}
       search={search}
