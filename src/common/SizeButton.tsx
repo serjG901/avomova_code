@@ -9,7 +9,6 @@ const style = `
     flex 
     px-4 
     m-2 
-    text-2xl 
     rounded 
     text-gray-600 
     border 

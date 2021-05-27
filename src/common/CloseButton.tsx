@@ -3,6 +3,14 @@ interface ICloseButton {
   action: () => void;
 }
 
+const hoverStyle = `${
+  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  )
+    ? ""
+    : "hover:bg-red-900 hover:text-black"
+}`;
+
 const style = `
     text-red-900
     font-bold 
@@ -12,8 +20,7 @@ const style = `
     rounded 
     border 
     border-red-900 
-    hover:bg-red-900 
-    hover:text-black
+    ${hoverStyle}
 `;
 
 export default function CloseButton({ target, action }: ICloseButton) {

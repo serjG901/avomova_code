@@ -10,6 +10,14 @@ import SizeButton from "../common/SizeButton";
 import MarksButton from "../common/MarksButton";
 import CloseButton from "../common/CloseButton";
 
+const hoverStyle = `${
+  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  )
+    ? ""
+    : "hover:bg-yellow-900 hover:text-black"
+}`;
+
 interface IPlayer {
   slug: string;
   mediaType: string;
@@ -208,7 +216,11 @@ export default function Player({
   const handleSetImageWidth = (value: string) => {
     if (value === "+") {
       switch (imageWidth) {
+        case "w-full": {
+          break;
+        }
         case "w-3/4": {
+          setImageWidth("w-full");
           break;
         }
         case "w-2/4": {
@@ -222,6 +234,10 @@ export default function Player({
       }
     } else {
       switch (imageWidth) {
+        case "w-full": {
+          setImageWidth("w-3/4");
+          break;
+        }
         case "w-3/4": {
           setImageWidth("w-2/4");
           break;
@@ -242,7 +258,7 @@ export default function Player({
       ref={ReaderRef}
       className={`absolute left-0 z-10 bg-black bg-opacity-90 w-full flex flex-col`}
     >
-      <div className="flex justify-between py-4">
+      <div className="flex justify-between">
         <div className="flex">
           <SizeButton
             text={`-`}
@@ -255,7 +271,7 @@ export default function Player({
           <SizeButton
             text={`+`}
             description={`bigger`}
-            notAllowed={imageWidth === "w-3/4"}
+            notAllowed={imageWidth === "w-full"}
             action={() => {
               handleSetImageWidth("+");
             }}
@@ -269,7 +285,7 @@ export default function Player({
         />
         <CloseButton target="reader" action={closePlayer} />
       </div>
-      <div className="flex flex-col self-center">
+      <div className="flex flex-col">
         <div className={`text-white ${loadingImage ? "animate-pulse" : ""}`}>
           {loadingImage ? (
             <LoadingDots />
@@ -278,9 +294,25 @@ export default function Player({
           )}
         </div>
         <div className="flex justify-center">
+          <img
+            className={`${imageWidth} ${loadingImage ? "animate-pulse" : ""}`}
+            alt={slug}
+            src={currentImage || "logo512.png"}
+            onLoad={() => setLoadingImage(false)}
+          />
+        </div>
+        <div className="flex justify-center">
           <div
             title="previous page"
-            className="px-2 flex justify-center items-center cursor-pointer w-1/6 text-white bg-gray-800 hover:bg-gray-600"
+            className={`text-yellow-900
+              font-bold 
+              p-2
+              m-2 
+              cursor-pointer 
+              rounded 
+              border 
+              border-yellow-900 
+              ${hoverStyle}`}
             onClick={() => {
               if (!loadingImage) {
                 prevPage();
@@ -290,15 +322,18 @@ export default function Player({
           >
             <div>prev</div>
           </div>
-          <img
-            className={`${imageWidth} ${loadingImage ? "animate-pulse" : ""}`}
-            alt={slug}
-            src={currentImage || "logo512.png"}
-            onLoad={() => setLoadingImage(false)}
-          />
+
           <div
             title="next page"
-            className="px-2 flex justify-center items-center cursor-pointer w-1/6 text-white bg-gray-800 hover:bg-gray-600"
+            className={`text-yellow-900
+              font-bold 
+              p-2
+              m-2 
+              cursor-pointer 
+              rounded 
+              border 
+              border-yellow-900 
+              ${hoverStyle}`}
             onClick={() => {
               if (!loadingImage) {
                 nextPage();
@@ -315,7 +350,7 @@ export default function Player({
           return (
             <div key={chapter.chapter} className="flex mb-4 flex-wrap p-2">
               <div className="flex flex-col">
-                <div className="text-white text-left">
+                <div className="text-white text-center">
                   chapter {chapter.chapter}
                 </div>
                 <div className="flex flex-wrap">
@@ -331,7 +366,7 @@ export default function Player({
                             flex
                             flex-col
                             w-24 
-                            pb-4
+                            p-4
                             border 
                             border-black 
                             text-sm 
@@ -357,7 +392,7 @@ export default function Player({
                             ReaderRef.current?.scrollIntoView();
                           }}
                         >
-                          <span>Page {index}</span>
+                          <div>Page {index}</div>
                           {chapterNumber === chapter.chapter && (
                             <img
                               className="self-center"

@@ -1,5 +1,13 @@
 import { useLocalStorage } from "../useLocalStorage";
 
+const hoverStyle = `${
+  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  )
+    ? ""
+    : "hover:bg-indigo-900 hover:text-black"
+}`;
+
 interface IMarksButton {
   slug: string;
   mediaType: string;
@@ -21,8 +29,7 @@ const style = `
     rounded 
     border 
     border-indigo-900 
-    hover:bg-indigo-900 
-    hover:text-black
+    ${hoverStyle}
 `;
 
 export default function MarksButton({

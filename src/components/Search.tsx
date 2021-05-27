@@ -17,13 +17,12 @@ const style = `
   `;
 
 const styleInput = `
-  transition-all
-  ease-linear
+  transition-width
   filter 
   drop-shadow-lg
   h-10 
   rounded-full
-  px-2 
+  px-4 
   m-2
   text-xl 
   appearance-none 
